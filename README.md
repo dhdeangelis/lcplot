@@ -20,3 +20,11 @@ perl LCplot.pl STAR CONSTELLATION NDAYS OBSERVER
 where OBSERVER is the AAVSO observer code
 
 In both cases the result is a PNG file with the plot.
+
+# EXAMPLE:
+
+This will plot the last 200 days of observations for khi Cygni, without highlighting any observer:
+
+perl LCplot.pl khi Cyg 200 
+
+It will produce a PNG image with name "Cyg-khi.png".
