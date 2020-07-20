@@ -2,9 +2,9 @@
 LCplot – a program to plot light curves of variable stars
 
 # About
-LCplot is a perl program that plots light curves for variable stars using data from the American Association of Variable Star Observers (AAVSO, aavso.org).
+LCplot is a Perl program that plots light curves for variable stars using data from the American Association of Variable Star Observers (AAVSO, aavso.org).
 
-LCplot is written in Perl and needs the Perl executable, the Perl modules DateTime, Astro::Time, and LWP::Simple, and gnuplot.
+LCplot is written in Perl 5. It needs the Perl executable and the modules DateTime, Astro::Time, and LWP::Simple, and [gnuplot](http://www.gnuplot.info/) as plotting routine.
 
 # USAGE
 To plot visual estimates and V band observations for
