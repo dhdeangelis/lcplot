@@ -10,19 +10,19 @@
 # To plot visual estimates and V band observations for
 # a star during the last N days use:
 #
-# perl LCplot.pl STAR CONSTELLATION NDAYS
+# perl lcplot.pl STAR CONSTELLATION NDAYS
 #
 # 
 # To optionally highlight observations done by OBSERVER.
 #
-# perl LCplot.pl STAR CONSTELLATION NDAYS OBSERVER
+# perl lcplot.pl STAR CONSTELLATION NDAYS OBSERVER
 #
 # where OBSERVER is the AAVSO observer code
 # 
 # The result is a PNG file with the plot.
 # 
 # EXAMPLE:
-# perl LCplot.pl khi Cyg 200 
+# perl lcplot.pl khi Cyg 200 
 # This will plot the last 200 days of observations for khi Cygni, without highlighting any observer
 #
 # This script is written in Perl and plots using gnuplot (gnuplot.info).
@@ -113,6 +113,8 @@ my $plotname = $const.'-'.$star;
 my $title = $star.' '.$const;
 
 # converts a DateTime object to calendar
+# extend last day by one day, to be sure include last observations made today
+$today = $today->add( days => 1 );
 my $yrlast = $today->year();
 my $molast = $today->month();
 my $dylast = $today->day();
@@ -130,6 +132,7 @@ if ($ndays <= 300) {
 	}
 elsif ($ndays > 300 && $ndays < 2000 ) {
 	$formatx = qw("%Y-%m");
+# 	$xtics = $ndays*86400/8;
 	$xtics = qw(autofreq);
 	}
 else {
