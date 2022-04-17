@@ -2,8 +2,8 @@
 
 # LCplot
 # Plots light curves from AAVSO data (aavso.org)
-# version 1.4
-# 2020-07-20
+# version 1.5
+# 2022-04-17
 
 # USAGE:
 #
@@ -75,9 +75,7 @@ while (<RAW>) {
     # identify and avoid fainter than
     next if $values[22] =~ m/1/gx;
     
-# 	# ta bort detta efter artikeln!
-# 	next if ($values[4] eq 'VFK');
-    
+    # converts to julian day
     my ($Xday, $Xmonth, $Xyear, $Xut) = mjd2cal($values[0] - 2400000.5); $Xut *= 24;
     
     # if observer was given, then prepare set, otherwise just separate visual and V band
@@ -160,13 +158,13 @@ set format x $formatx
 set xtics $xtics
 set xrange ['$Iyear-$Imonth-$Iday':'$yrlast-$molast-$dylast']
 set format y "%.1f"
-plot 'visALL.fooz' u 1:3 w points pt 7 ps 0.25 lc rgbcolor "black" title "visual obs", 'Vband.fooz' u 1:3 w points pt 5 ps 0.5 lc rgbcolor "green" title "V band"
+plot 'Vband.fooz' u 1:3 w points pt 5 ps 0.5 lc rgbcolor "green" title "V band", 'visALL.fooz' u 1:3 w points pt 7 ps 0.25 lc rgbcolor "black" title "visual obs",
 EOF
 
 # adds optional line for OBSERVER
 if (defined $observer) {
 	chomp $gnuplotcf;
-	$gnuplotcf .= qq(, 'visOBS.fooz' u 1:3 w points pt 1 ps 3 lw 2 lc rgbcolor "blue" title "obs by $observer");
+	$gnuplotcf .= qq( 'visOBS.fooz' u 1:3 w points pt 1 ps 3 lw 2 lc rgbcolor "blue" title "obs by $observer");
 	}
 
 # prints config file
