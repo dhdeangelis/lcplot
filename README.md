@@ -27,3 +27,9 @@ This will plot the last 200 days of observations for khi Cygni, without highligh
 `lcplot.pl khi Cyg 200`
 
 It will produce a PNG image with name "Cyg-khi.png".
+
+If we add to the same line an AAVSO observer code, for example, "OBS":
+
+`lcplot.pl khi Cyg 200 OBS`
+
+It will higlight observations contributed by observer OBS using blue crosses.
