@@ -26,7 +26,7 @@ In both cases the result is a PNG file with the plot.
 
 # EXAMPLE:
 
-This will plot the last 200 days of observations for khi Cygni, visual and in V band, without highlighting any observer:
+This will plot the last 200 days of observations for khi Cygni, visual observations and photometric V band, without highlighting any observer:
 
 `lcplot khi Cyg Vis,V 200`
 
