@@ -28,12 +28,12 @@ In both cases the result is a PNG file with the plot.
 
 This will plot the last 200 days of observations for khi Cygni, visual and in V band, without highlighting any observer:
 
-`lcplot.pl khi Cyg Vis,V 200`
+`lcplot khi Cyg Vis,V 200`
 
 It will produce a PNG image with name "Cyg-khi.png".
 
 If we add to the same line an AAVSO observer code, for example, "OBS":
 
-`lcplot.pl khi Cyg Vis,V 200 OBS`
+`lcplot khi Cyg Vis,V 200 OBS`
 
 It will higlight observations contributed by observer OBS using blue crosses.
