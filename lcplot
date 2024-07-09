@@ -1,0 +1,206 @@
+#!/usr/local/bin/perl
+
+# lcplot
+# Plots light curves from AAVSO data (aavso.org)
+# version 2.0
+# 2024-07-09
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# USAGE:
+#
+# To plot visual estimates and V observations for
+# a star during the last N days use:
+#
+# lcplot STAR CONSTELLATION BANDS NDAYS
+#
+# 
+# To optionally highlight observations done by OBSERVER.
+#
+# lcplot STAR CONSTELLATION BANDS NDAYS OBSERVER
+#
+# where
+# BANDS is a comma separated list including any of: Vis,B,V,R,I
+# OBSERVER is the AAVSO observer code
+# 
+# The result is a PNG file with the plot.
+# 
+# EXAMPLE:
+# lcplot khi Cyg Vis,V 200 
+# This will plot the last 200 days of observations, visual and in V band, for khi Cygni
+# without highlighting any observer
+#
+# This script is written in Perl and plots using gnuplot.
+# It requires gnuplot, perl and some perl modules listed below.
+# Tested in Linux. Should in principle work on other platforms.
+# 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # 
+
+# pragmas
+use warnings;
+use strict;
+
+# modules
+use DateTime;
+use Astro::Time qw(mjd2cal);
+use LWP::Simple qw(getstore);
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # 
+
+# read input from command line
+my ($star, $const, $userBands, $ndays, $observer) = @ARGV;
+
+# parse band input
+my @userBands = split /,/, $userBands;
+
+# sort out dates, converts to julian date
+my $today = DateTime->now;
+my $jd = $today->jd();
+my $lastdate = $jd - $ndays;
+
+# ensemble request
+my $request = qq(https://www.aavso.org/vsx/index.php?view=api.delim&ident="$star $const"&fromjd=$lastdate&tojd=$jd&delimiter=,);
+
+# get data from aavso.org and writes a file 
+my @data = getstore($request, "rawdata.dat");
+
+# define bands and its filenames
+my %bands = (
+    'Vis' => 'OFVIS',
+    'B' => 'OFB',
+    'V' => 'OFV',
+    'R' => 'OFR',
+    'I' => 'OFI',
+    );
+
+# define rendering table
+my %bandRender = (
+    'Vis' => 'u 1:3 w points pt 7 ps 0.25 lc rgbcolor "black" title "vis"',
+    'B' => 'u 1:3 w points pt 5 ps 0.4 lc rgbcolor "blue" title "B"',
+    'V' => 'u 1:3 w points pt 5 ps 0.4 lc rgbcolor "green" title "V"',
+    'R' => 'u 1:3 w points pt 5 ps 0.4 lc rgbcolor "red" title "R"',
+    'I' => 'u 1:3 w points pt 5 ps 0.4 lc rgbcolor "pink" title "I"',
+    );
+    
+# start plot string
+my $plotString = "plot ";
+
+# loop through chosen bands
+# foreach my $band (sort keys %bands) {
+foreach my $band (sort @userBands) {
+    
+    # open output, normal
+    open (OF, '>', "$bands{$band}.dat");
+    # open a file for observer data if observer is given
+    if (defined $observer) {
+        open (OFOB, '>', "$bands{$band}_OBS.dat");
+        }
+    
+    # open raw data file and parse data
+    open (RAW, "<", "rawdata.dat");
+    while (<RAW>) {
+        # do not read first line
+        next if $. == 1;
+        # parse line
+        chomp;
+        s/"//g;
+        my @values = split(',', $_);
+        
+        # identify and avoid discrepant values
+        next if $values[12] eq "T";
+        # identify and avoid fainter than
+        next if $values[22] eq "T";
+        # identify and avoid fainter than
+        next if $values[22] =~ m/1/gx;
+        
+        # converts to julian day
+        my ($Xday, $Xmonth, $Xyear, $Xut) = mjd2cal($values[0] - 2400000.5); $Xut *= 24;
+
+        # if no observer
+        if (defined $values[1] && defined $values[2] && $values[3] =~ m/$band{1}/ ) {
+            next if $band eq 'V' && $values[3] eq 'Vis.';
+            print OF "$Xyear-$Xmonth-$Xday $Xut \t $values[1] \n";
+            }
+        # with observer
+        if (defined $observer && $band eq 'Vis') {
+            if (defined $values[1] && $values[3] =~ m/$band{1}/ && $values[4] eq $observer) {
+                print OFOB "$Xyear-$Xmonth-$Xday $Xut \t $values[1] \n";
+                }
+            }
+        }
+    close RAW;
+    close OF;
+    close OFOB;
+    
+    # add to plotstring
+    $plotString = $plotString."'$bands{$band}.dat' $bandRender{$band}, ";
+    if (defined $observer && -s "$bands{$band}_OBS.dat" ) { $plotString = $plotString.qq{'$bands{$band}_OBS.dat' u 1:3 w points pt 1 ps 3 lw 2 lc rgbcolor "blue" title "obs by $observer",} }
+    }
+
+# plot name and title
+my $plotname = $const.'-'.$star;
+my $title = $star.' '.$const;
+
+# extend last day by one day, to be sure include last observations made today
+$today = $today->add( days => 1 );
+my $yrlast = $today->year();
+my $molast = $today->month();
+my $dylast = $today->day();
+
+# convert AstroTime object to calendar date
+my ($Iday, $Imonth, $Iyear, $Iut) = mjd2cal($lastdate - 2400000.5);
+
+# decide adequate time scale tic and label spacings
+my $formatx;
+my $xtics;
+if ($ndays <= 30) {
+	$formatx = qw("%m-%d");
+	$xtics = $ndays*86400/5;
+	}
+elsif ($ndays <= 300) {
+	$formatx = qw("%Y-%m-%d");
+	$xtics = $ndays*86400/5;
+	}
+elsif ($ndays > 300 && $ndays < 2000 ) {
+	$formatx = qw("%Y-%m");
+# 	$xtics = $ndays*86400/8;
+	$xtics = qw(autofreq);
+	}
+else {
+	$formatx = qw("%Y");
+	$xtics = qw(autofreq);
+	}
+
+# prepare config file
+my $gnuplotcf = <<EOF;
+set terminal pngcairo enhanced size 960,640 font "Bitstream-Vera-Sans,9"
+set output '$plotname.png'
+set title '$title' font "Bitstream-Vera-Sans-Bold',18"
+set bmargin 6
+set rmargin 6
+set lmargin 6
+# set label "Observations from the AAVSO International Database (www.aavso.org)" at screen 0.5, 0.07 center
+set label "Observationer från AAVSO International Database (www.aavso.org)" at screen 0.5, 0.07 center
+set key outside bottom center horizontal
+set grid
+set yrange [] reverse
+set xdata time
+set timefmt "%Y-%m-%d %H"
+set format x $formatx
+set xtics $xtics
+set xrange ['$Iyear-$Imonth-$Iday':'$yrlast-$molast-$dylast']
+set format y "%.1f"
+$plotString
+EOF
+
+# write config file
+open (GNUPLOTCF,">", "gnuplot.conf");
+print GNUPLOTCF $gnuplotcf;
+close GNUPLOTCF;
+
+# execute gnuplot
+system "gnuplot 'gnuplot.conf'";
+
+# delete temporary files
+unlink "gnuplot.conf";
+unlink glob "*.dat";
