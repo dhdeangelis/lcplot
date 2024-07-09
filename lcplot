@@ -159,11 +159,10 @@ if ($ndays <= 30) {
 	}
 elsif ($ndays <= 300) {
 	$formatx = qw("%Y-%m-%d");
-	$xtics = $ndays*86400/5;
+    $xtics = qw(autofreq);
 	}
 elsif ($ndays > 300 && $ndays < 2000 ) {
 	$formatx = qw("%Y-%m");
-# 	$xtics = $ndays*86400/8;
 	$xtics = qw(autofreq);
 	}
 else {
