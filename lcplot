@@ -86,7 +86,6 @@ my %bandRender = (
 my $plotString = "plot ";
 
 # loop through chosen bands
-# foreach my $band (sort keys %bands) {
 foreach my $band (sort @userBands) {
     
     # open output, normal
@@ -141,7 +140,7 @@ foreach my $band (sort @userBands) {
 my $plotname = $const.'-'.$star;
 my $title = $star.' '.$const;
 
-# extend last day by one day, to be sure include last observations made today
+# extend last day by one to include last observations made today
 $today = $today->add( days => 1 );
 my $yrlast = $today->year();
 my $molast = $today->month();
@@ -150,7 +149,7 @@ my $dylast = $today->day();
 # convert AstroTime object to calendar date
 my ($Iday, $Imonth, $Iyear, $Iut) = mjd2cal($lastdate - 2400000.5);
 
-# decide adequate time scale tic and label spacings
+# decide adequate time scale tic and label spacing
 my $formatx;
 my $xtics;
 if ($ndays <= 200) {
@@ -168,13 +167,15 @@ else {
 
 # prepare config file
 my $gnuplotcf = <<EOF;
-set terminal pngcairo enhanced size 960,640 font "Bitstream-Vera-Sans,9"
+set terminal pngcairo enhanced size 960,640 font "DejaVu-Sans,9"
 set output '$plotname.png'
-set title '$title' font "Bitstream-Vera-Sans-Bold',18"
+set title '$title' font "DejaVu-Sans-Bold',18"
 set bmargin 6
 set rmargin 6
 set lmargin 6
+# # eng
 # set label "Observations from the AAVSO International Database (www.aavso.org)" at screen 0.5, 0.07 center
+# sv
 set label "Observationer från AAVSO International Database (www.aavso.org)" at screen 0.5, 0.07 center
 set key outside bottom center horizontal
 set grid
