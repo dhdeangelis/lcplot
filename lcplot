@@ -153,17 +153,13 @@ my ($Iday, $Imonth, $Iyear, $Iut) = mjd2cal($lastdate - 2400000.5);
 # decide adequate time scale tic and label spacings
 my $formatx;
 my $xtics;
-if ($ndays <= 30) {
+if ($ndays <= 200) {
 	$formatx = qw("%m-%d");
 	$xtics = $ndays*86400/5;
 	}
-elsif ($ndays <= 300) {
-	$formatx = qw("%Y-%m-%d");
-    $xtics = qw(autofreq);
-	}
-elsif ($ndays > 300 && $ndays < 2000 ) {
+elsif ($ndays > 200 && $ndays <= 3000) {
 	$formatx = qw("%Y-%m");
-	$xtics = qw(autofreq);
+    $xtics = qw(autofreq);
 	}
 else {
 	$formatx = qw("%Y");
