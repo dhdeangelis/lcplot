@@ -10,26 +10,30 @@ lcplot is written in [Perl 5](https://github.com/Perl/perl5). Apart from the Per
 To plot visual estimates and V band observations for
 a star during the last N days use:
 
-`lcplot.pl STAR CONSTELLATION NDAYS`
+`lcplot STAR CONSTELLATION BANDS NDAYS`
  
 To optionally highlight observations done by OBSERVER.
 
-`lcplot.pl STAR CONSTELLATION NDAYS OBSERVER`
+`lcplot STAR CONSTELLATION BANDS NDAYS OBSERVER`
 
-where OBSERVER is the AAVSO observer code
+where:
+
+BANDS is a comma separated list including any of: Vis,B,V,R,I
+
+OBSERVER is the AAVSO observer code
 
 In both cases the result is a PNG file with the plot.
 
 # EXAMPLE:
 
-This will plot the last 200 days of observations for khi Cygni, without highlighting any observer:
+This will plot the last 200 days of observations for khi Cygni, visual and in V band, without highlighting any observer:
 
-`lcplot.pl khi Cyg 200`
+`lcplot.pl khi Cyg Vis,V 200`
 
 It will produce a PNG image with name "Cyg-khi.png".
 
 If we add to the same line an AAVSO observer code, for example, "OBS":
 
-`lcplot.pl khi Cyg 200 OBS`
+`lcplot.pl khi Cyg Vis,V 200 OBS`
 
 It will higlight observations contributed by observer OBS using blue crosses.
