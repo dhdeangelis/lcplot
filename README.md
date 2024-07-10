@@ -24,7 +24,7 @@ OBSERVER is the AAVSO observer code
 
 In both cases the result is a PNG file with the plot.
 
-# EXAMPLE:
+# EXAMPLE
 
 This will plot the last 200 days of observations for khi Cygni, visual observations and photometric V band, without highlighting any observer:
 
