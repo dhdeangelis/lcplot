@@ -1,5 +1,5 @@
 # lcplot
-lcplot – a lightweigth program for plotting light curves of variable stars using AAVSO data
+lcplot – a lightweight program for plotting light curves of variable stars using AAVSO data
 
 # About
 lcplot is a command-line program that plots light curves of variable stars using data from the [American Association of Variable Star Observers (AAVSO)](https://www.aavso.org/).
